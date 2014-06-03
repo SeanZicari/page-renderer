@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A layout example with a side menu that hides on mobile, just like the Pure website.">
+    <title>Side Menu &ndash; Layout Examples &ndash; Pure</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.5.0/pure-min.css">
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="css/layouts/side-menu-old-ie.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="css/layouts/side-menu.css">
+    <!--<![endif]-->
+</head>
+<body>
+    <div id="layout">
+        <!-- Menu toggle -->
+        <a href="#menu" id="menuLink" class="menu-link">
+            <!-- Hamburger icon -->
+            <span></span>
+        </a>
+
+        <div id="menu">
+            <div class="pure-menu pure-menu-open">
+                <a class="pure-menu-heading" href="#">JS Rendering</a>
+
+                <ul>
+                </ul>
+            </div>
+        </div>
+
+        <div id="main">
+            <div class="header">
+                <h1>Welcome!</h1>
+                <h2>You can see any of the pages on the left</h2>
+            </div>
+
+            <div class="content">
+                <h2 class="content-subhead">Let's get started</h2>
+                <p>
+                    Just click any of the <code>Page x</code> links on the left to see the corresponding page.
+                </p>
+
+                <br>
+
+            </div>
+
+            <div class="footer">
+                <p>The first footer</p>
+            </div>
+        </div>
+    </div>
+
+    <div style="display: none">
+
+    <!-- Header 1 -->
+    <div id="header_1">
+        <div class="header">
+            <h1>Header 1</h1>
+            <h2>A subtitle for the first page</h2>
+        </div>
+    </div>
+
+    <!-- Header 2 -->
+    <div id="header_2">
+        <div class="header">
+            <h1>Header 2</h1>
+            <h2>A subtitle for the second page</h2>
+        </div>
+    </div>
+
+    <!-- Body 1 -->
+    <div id="body_1">
+        <div class="content">
+            <h2 class="content-subhead">The first page's body</h2>
+            <p>
+                To use this layout, you can just copy paste the HTML, along with the CSS in <a href="/css/layouts/side-menu.css" alt="Side Menu CSS">side-menu.css</a>, and the JavaScript in <a href="/js/ui.js">ui.js</a>. The JS file uses vanilla JavaScript to simply toggle an <code>active</code> class that makes the menu responsive.
+            </p>
+        </div>
+    </div>
+
+    <!-- Body 2 -->
+    <div id="body_2">
+        <div class="content">
+            <h2 class="content-subhead">The second page's body</h2>
+            <p>
+                To use this layout, you can just copy paste the HTML, along with the CSS in <a href="/css/layouts/side-menu.css" alt="Side Menu CSS">side-menu.css</a>, and the JavaScript in <a href="/js/ui.js">ui.js</a>. The JS file uses vanilla JavaScript to simply toggle an <code>active</code> class that makes the menu responsive.
+            </p>
+        </div>
+    </div>
+
+    <!-- Body 3 -->
+    <div id="body_3">
+        <div class="content">
+            <h2 class="content-subhead">The third page's body</h2>
+            <p>
+                To use this layout, you can just copy paste the HTML, along with the CSS in <a href="/css/layouts/side-menu.css" alt="Side Menu CSS">side-menu.css</a>, and the JavaScript in <a href="/js/ui.js">ui.js</a>. The JS file uses vanilla JavaScript to simply toggle an <code>active</code> class that makes the menu responsive.
+            </p>
+        </div>
+    </div>
+
+    <!-- Footer 1 -->
+    <div id="footer_1">
+        <div class="footer">
+            <p>The first footer</p>
+        </div>
+    </div>
+
+    <!-- Footer 2 -->
+    <div id="footer_2">
+        <div class="footer">
+            <p>The second footer</p>
+        </div>
+    </div>
+
+    <!-- Ad 1 -->
+    <div id="ad_1">
+        <div class="content">
+            <h2>THIS IS AN AD</h2>
+            <p>
+                I trust you're opening your wallet as you read this. Excellent.
+            </p>
+        </div>
+    </div>
+
+    </div>
+
+    <script type="text/javascript">
+    var PageFragment = function (html)
+        {
+            var _html = html;
+
+            this.get_html = function ()
+            {
+                return _html;
+            }
+        },
+
+        Page = function ()
+        {
+            var _page_sections = {'header': null,
+                                  'body': null,
+                                  'footer': null,
+                                  'ad': null},
+
+                _section_order = ['header', 'body', 'ad', 'footer'];
+
+            this.register_section = function (section, page_fragment)
+            {
+                if (!(section in _page_sections))
+                {
+                    throw new Error("Unknown page section: " + section);
+                }
+
+                _page_sections[section] = page_fragment;
+
+                // Going with a fluent interface to make chaining the page 
+                // registrations easier.
+                return this;
+            };
+
+            this.render = function ()
+            {
+                var section,
+                    page = '';
+
+                for (var index in _section_order)
+                {
+                    section = _page_sections[_section_order[index]];
+
+                    if (section)
+                    {
+                        page += section.get_html();
+                    }
+                }
+
+                return page;
+            }
+        },
+
+        PageManager = function ()
+        {
+            var _pages = {},
+                _menu = null,
+                _page = null
+                _current_page_link = null,
+                _active_link_classes = 'menu-item-divided pure-menu-selected',
+
+                _append_to_menu = function (name)
+                {
+                    var li = document.createElement('li'),
+                        a = document.createElement('a');
+
+                    // Prepending a hash for graceful degradation - if the
+                    // JavaScript fails for any reason, the browser will not
+                    // try to load a page that won't work.
+                    a.setAttribute('href', '#' + name);
+                    a.appendChild(document.createTextNode(name));
+                    a.addEventListener('click', function (event)
+                    {
+                        var target = event.target,
+                            page_name = target.getAttribute('href').substring(1);
+
+                        _render_page(page_name);
+                        _update_links(target);
+
+                        event.stopPropagation();
+                        event.preventDefault();
+                    });
+
+                    li.appendChild(a);
+
+                    _menu.appendChild(li);
+                },
+
+                _render_page = function (name)
+                {
+                    _page.innerHTML = _pages[name].render();
+                },
+
+                _update_links = function (new_link)
+                {
+                    var li = new_link.parentNode;
+
+                    li.className = _active_link_classes;
+
+                    if (_current_page_link)
+                    {
+                        _current_page_link.parentNode.className = '';
+                    }
+
+                    _current_page_link = new_link;  
+                };
+
+            this.init = function ()
+            {
+                // Grab the menu
+                _menu = document.getElementById('menu').getElementsByTagName('ul')[0];
+                _page = document.getElementById('main');
+            };
+
+            this.register_page = function (name, page)
+            {
+                _pages[name] = page;
+
+                _append_to_menu(name);
+            };
+        };
+
+        var pr = new PageManager(),
+
+            header1 = new PageFragment(document.getElementById('header_1').innerHTML),
+            header2 = new PageFragment(document.getElementById('header_2').innerHTML),
+            body1 = new PageFragment(document.getElementById('body_1').innerHTML),
+            body2 = new PageFragment(document.getElementById('body_2').innerHTML),
+            body3 = new PageFragment(document.getElementById('body_3').innerHTML),
+            footer1 = new PageFragment(document.getElementById('footer_1').innerHTML),
+            footer2 = new PageFragment(document.getElementById('footer_2').innerHTML),
+            ad1 = new PageFragment(document.getElementById('ad_1').innerHTML),
+
+            page1 = new Page(),
+            page2 = new Page(),
+            page3 = new Page(),
+            page4 = new Page();
+
+        page1.register_section('header', header1)
+             .register_section('footer', footer1);
+
+        page2.register_section('header', header1)
+             .register_section('body', body1)
+             .register_section('footer', footer1);
+
+        page3.register_section('header', header1)
+             .register_section('body', body2)
+             .register_section('footer', footer2);
+
+        page4.register_section('header', header2)
+             .register_section('body', body3)
+             .register_section('ad', ad1)
+             .register_section('footer', footer1);
+
+        pr.init();
+
+        pr.register_page('Page 1', page1);
+        pr.register_page('Page 2', page2);
+        pr.register_page('Page 3', page3);
+        pr.register_page('Page 4', page4);
+    </script>
+</body>
+</html>
