@@ -127,16 +127,30 @@
     </div>
 
     <script type="text/javascript">
+        /**
+         * Encapsulation for a fragment of HTML.
+         * @param {String} html The actual markup as a JavaScript string.
+         */
     var PageFragment = function (html)
         {
             var _html = html;
 
+            /**
+             * Returns the fragment as a JavaScript string.
+             * 
+             * @return {String} The page fragment in string form.
+             */
             this.get_html = function ()
             {
                 return _html;
             }
         },
 
+        /**
+         * Encapsulation of an HTML page, representing each section of the
+         * page as a PageFragment. Allowed sections are header, body, footer
+         * and ad.
+         */
         Page = function ()
         {
             var _page_sections = {'header': null,
@@ -146,6 +160,18 @@
 
                 _section_order = ['header', 'body', 'ad', 'footer'];
 
+            /**
+             * Registers a section by name and fragment. Returns the object
+             * itself to adhere to the fluent interface style, just to make
+             * chaining register calls easier.
+             * 
+             * @param  {String}       section       The section name to
+             *                                      register the page 
+             *                                      fragment with.
+             * @param  {PageFragment} page_fragment The HTML encapsulation of
+             *                                      a section of the page.
+             * @return {Page}                       This Page object.
+             */
             this.register_section = function (section, page_fragment)
             {
                 if (!(section in _page_sections))
@@ -160,6 +186,13 @@
                 return this;
             };
 
+            /**
+             * Iterates over each section and, if it has been registered,
+             * includes it in the final rendered page.
+             * 
+             * @return {String} The page, rendered and ready to insert into
+             *                  the DOM.
+             */
             this.render = function ()
             {
                 var section,
@@ -179,6 +212,12 @@
             }
         },
 
+        /**
+         * An object that manages all of the pages that are registered. It
+         * manages them by first adding a link to the left side nav with a
+         * callback to update the nav when clicked and render the new page
+         * out.
+         */
         PageManager = function ()
         {
             var _pages = {},
@@ -187,6 +226,12 @@
                 _current_page_link = null,
                 _active_link_classes = 'menu-item-divided pure-menu-selected',
 
+                /**
+                 * Appends a list item with a link to the primary page
+                 * navigation when a new page is registered.
+                 * 
+                 * @param  {String} name The name of the new page link.
+                 */
                 _append_to_menu = function (name)
                 {
                     var li = document.createElement('li'),
@@ -214,11 +259,23 @@
                     _menu.appendChild(li);
                 },
 
+                /**
+                 * Renders out the page and injects the result into the DOM.
+                 * 
+                 * @param  {String} name The page name to render/inject.
+                 */
                 _render_page = function (name)
                 {
                     _page.innerHTML = _pages[name].render();
                 },
 
+                /**
+                 * "Activates" the new link and "deactivates" the old link, if
+                 * applicable.
+                 * 
+                 * @param  {DOMElement} new_link A reference to the new link
+                 *                      element.
+                 */
                 _update_links = function (new_link)
                 {
                     var li = new_link.parentNode;
@@ -233,6 +290,10 @@
                     _current_page_link = new_link;  
                 };
 
+            /**
+             * Grabs a reference to the menu and the page where the DOM will
+             * be updated.
+             */
             this.init = function ()
             {
                 // Grab the menu
@@ -240,6 +301,15 @@
                 _page = document.getElementById('main');
             };
 
+            /**
+             * Takes in a Page object and registers it by the given name. The
+             * page becomes a link in the primary navigation as well.
+             * 
+             * @param  {String} name The name to register the page by.
+             * @param  {Page}   page The actual Page object that contains page
+             *                  fragments that will be rendered out to the
+             *                  actual page.
+             */
             this.register_page = function (name, page)
             {
                 _pages[name] = page;
