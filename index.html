@@ -318,7 +318,7 @@
             };
         };
 
-        var pr = new PageManager(),
+        var pm = new PageManager(),
 
             header1 = new PageFragment(document.getElementById('header_1').innerHTML),
             header2 = new PageFragment(document.getElementById('header_2').innerHTML),
@@ -350,12 +350,12 @@
              .register_section('ad', ad1)
              .register_section('footer', footer1);
 
-        pr.init();
+        pm.init();
 
-        pr.register_page('Page 1', page1);
-        pr.register_page('Page 2', page2);
-        pr.register_page('Page 3', page3);
-        pr.register_page('Page 4', page4);
+        pm.register_page('Page 1', page1);
+        pm.register_page('Page 2', page2);
+        pm.register_page('Page 3', page3);
+        pm.register_page('Page 4', page4);
     </script>
 </body>
 </html>
